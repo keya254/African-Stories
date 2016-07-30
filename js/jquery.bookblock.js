@@ -249,3 +249,133 @@
 			}
 
 		},
+		// with no support we consider no 3d transforms and transitions
+		_layoutNoSupport: function(dir) {
+
+			this.$items.hide();
+			this.$nextItem.show();
+			this.end = false;
+			this.isAnimating = false;
+			var isLimit = dir === 'next' && this.current === this.itemsCount - 1 || dir === 'prev' && this.current === 0;
+			// callback trigger
+			this.options.onEndFlip(this.previous, this.current, isLimit);
+
+		},
+		// creates the necessary layout for the 3d animation, and triggers the transitions
+		_layout: function(dir) {
+
+			var self = this,
+
+				// basic structure:
+				// 1 element for the left side.
+				$s_left = this._addSide('left', dir),
+				// 1 element for the flipping/middle page
+				$s_middle = this._addSide('middle', dir),
+				// 1 element for the right side
+				$s_right = this._addSide('right', dir),
+				// overlays
+				$o_left = $s_left.find('div.bb-overlay'),
+				$o_middle_f = $s_middle.find('div.bb-flipoverlay:first'),
+				$o_middle_b = $s_middle.find('div.bb-flipoverlay:last'),
+				$o_right = $s_right.find('div.bb-overlay'),
+				speed = this.end ? 400 : this.options.speed;
+
+			this.$items.hide();
+			this.$el.prepend($s_left, $s_middle, $s_right);
+
+			$s_middle.css({
+				transition: 'all ' + speed + 'ms ' + this.options.easing
+			}).on(this.transEndEventName, function(event) {
+
+				if (event.target.className === 'bb-page') {
+
+					self.$el.children('div.bb-page').remove();
+					self.$nextItem.show();
+
+					self.end = false;
+					self.isAnimating = false;
+
+					var isLimit = dir === 'next' && self.current === self.itemsCount - 1 || dir === 'prev' && self.current === 0;
+
+					// callback trigger
+					self.options.onEndFlip(self.previous, self.current, isLimit);
+
+				}
+
+			});
+
+			if (dir === 'prev') {
+				$s_middle.css({ transform: 'rotateY(-180deg)' });
+			}
+
+			// overlays
+			if (this.options.shadows && !this.end) {
+
+				var o_left_style = (dir === 'next') ? {
+					transition: 'opacity ' + this.options.speed / 2 + 'ms ' + 'linear' + ' ' + this.options.speed / 2 + 'ms'
+				} : {
+					transition: 'opacity ' + this.options.speed / 2 + 'ms ' + 'linear',
+					opacity: this.options.shadowSides
+				},
+					o_middle_f_style = (dir === 'next') ? {
+						transition: 'opacity ' + this.options.speed / 2 + 'ms ' + 'linear'
+					} : {
+						transition: 'opacity ' + this.options.speed / 2 + 'ms ' + 'linear' + ' ' + this.options.speed / 2 + 'ms',
+						opacity: this.options.shadowFlip
+					},
+					o_middle_b_style = (dir === 'next') ? {
+						transition: 'opacity ' + this.options.speed / 2 + 'ms ' + 'linear' + ' ' + this.options.speed / 2 + 'ms',
+						opacity: this.options.shadowFlip
+					} : {
+						transition: 'opacity ' + this.options.speed / 2 + 'ms ' + 'linear'
+					},
+					o_right_style = (dir === 'next') ? {
+						transition: 'opacity ' + this.options.speed / 2 + 'ms ' + 'linear',
+						opacity: this.options.shadowSides
+					} : {
+						transition: 'opacity ' + this.options.speed / 2 + 'ms ' + 'linear' + ' ' + this.options.speed / 2 + 'ms'
+					};
+
+				$o_middle_f.css(o_middle_f_style);
+				$o_middle_b.css(o_middle_b_style);
+				$o_left.css(o_left_style);
+				$o_right.css(o_right_style);
+
+			}
+
+			setTimeout(function() {
+
+				var style = dir === 'next' ? 'rotateY(-180deg)' : 'rotateY(0deg)';
+
+				if (self.end) {
+					// first && last pages lift up 15 deg when we can't go further
+					style = dir === 'next' ? 'rotateY(-15deg)' : 'rotateY(-165deg)';
+				}
+
+				$s_middle.css({transform: style});
+
+				// overlays
+				if (self.options.shadows && !self.end) {
+
+					$o_middle_f.css({
+						opacity: dir === 'next' ? self.options.shadowFlip : 0
+					});
+
+					$o_middle_b.css({
+						opacity: dir === 'next' ? 0 : self.options.shadowFlip
+					});
+
+					$o_left.css({
+						opacity: dir === 'next' ? self.options.shadowSides : 0
+					});
+
+					$o_right.css({
+						opacity: dir === 'next' ? 0 : self.options.shadowSides
+					});
+
+				}
+
+
+			}, 30);
+
+		},
