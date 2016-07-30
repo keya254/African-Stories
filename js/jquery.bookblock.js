@@ -131,3 +131,121 @@
 			}
 
 		},
+		_initEvents: function() {
+
+			var self = this;
+
+			if (this.options.nextEl !== '') {
+
+				$(this.options.nextEl).on('click.bookblock', function() {
+
+					self._action('next');
+					return false;
+
+				});
+
+			}
+
+			if (this.options.prevEl !== '') {
+
+				$(this.options.prevEl).on('click.bookblock', function() {
+
+					self._action('prev');
+					return false;
+
+				});
+
+			}
+
+			if (this.options.keyboard == true) {
+				$(document).keydown(function(e) {
+					var keyCode = e.keyCode || e.which,
+						arrow = {
+							left : 37,
+							up : 38,
+							right : 39,
+							down : 40
+						};
+
+					switch (keyCode) {
+						case arrow.left:
+							self._action('prev');
+							break;
+						case arrow.right:
+							self._action('next');
+							break;
+					}
+				});
+			}
+
+			$window.on( 'debouncedresize', function() {
+							
+				// update width value
+				self.elWidth = self.$el.width();
+
+			} )
+
+		},
+		_action : function(dir, page) {
+
+			this._stopSlideshow();
+			this._navigate(dir, page);
+
+		},
+		_navigate: function(dir, page) {
+
+			if (this.isAnimating) {
+				return false;
+			}
+
+			// callback trigger
+			this.options.onBeforeFlip(this.current);
+
+			this.isAnimating = true;
+			this.$current = this.$items.eq(this.current);
+
+			if (page !== undefined) {
+
+				this.current = page;
+
+			} else if (dir === 'next') {
+
+				if (!this.options.circular && this.current === this.itemsCount - 1) {
+
+					this.end = true;
+
+				} else {
+
+					this.previous = this.current;
+					this.current = this.current < this.itemsCount - 1 ? this.current + 1 : 0;
+
+				}
+
+			} else if (dir === 'prev') {
+
+				if (!this.options.circular && this.current === 0) {
+
+					this.end = true;
+
+				} else {
+
+					this.previous = this.current;
+					this.current = this.current > 0 ? this.current - 1 : this.itemsCount - 1;
+
+				}
+
+			}
+
+			this.$nextItem = !this.options.circular && this.end ? this.$current : this.$items.eq(this.current);
+			
+			if (!this.support) {
+
+				this._layoutNoSupport(dir);
+
+			} else {
+
+				this._layout(dir);
+
+			}
+
+		},
