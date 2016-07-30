@@ -508,3 +508,120 @@ var Meny = {
 				touchMoveY = event.touches[0].clientY - indentY;
 
 				var swipeMethod = null;
+
+				// Check for swipe gestures in any direction
+
+				if( Math.abs( touchMoveX - touchStartX ) > Math.abs( touchMoveY - touchStartY ) ) {
+					if( touchMoveX < touchStartX - config.threshold ) {
+						swipeMethod = onSwipeRight;
+					}
+					else if( touchMoveX > touchStartX + config.threshold ) {
+						swipeMethod = onSwipeLeft;
+					}
+				}
+				else {
+					if( touchMoveY < touchStartY - config.threshold ) {
+						swipeMethod = onSwipeDown;
+					}
+					else if( touchMoveY > touchStartY + config.threshold ) {
+						swipeMethod = onSwipeUp;
+					}
+				}
+
+				if( swipeMethod && swipeMethod() ) {
+					event.preventDefault();
+				}
+			}
+
+			function onTouchEnd( event ) {
+				Meny.unbindEvent( document, 'touchmove', onTouchMove );
+
+				// If there was no movement this was a tap
+				if( touchMoveX === null && touchMoveY === null ) {
+					onTap();
+				}
+			}
+
+			function onTap() {
+				var isOverContent = ( config.position === POSITION_T && touchStartY > config.height ) ||
+									( config.position === POSITION_R && touchStartX < dom.wrapper.offsetWidth - config.width ) ||
+									( config.position === POSITION_B && touchStartY < dom.wrapper.offsetHeight - config.height ) ||
+									( config.position === POSITION_L && touchStartX > config.width );
+
+				if( isOverContent ) {
+					close();
+				}
+			}
+
+			function onSwipeLeft() {
+				if( config.position === POSITION_R && isOpen ) {
+					close();
+					return true;
+				}
+				else if( config.position === POSITION_L && !isOpen ) {
+					open();
+					return true;
+				}
+			}
+
+			function onSwipeRight() {
+				if( config.position === POSITION_R && !isOpen ) {
+					open();
+					return true;
+				}
+				else if( config.position === POSITION_L && isOpen ) {
+					close();
+					return true;
+				}
+			}
+
+			function onSwipeUp() {
+				if( config.position === POSITION_B && isOpen ) {
+					close();
+					return true;
+				}
+				else if( config.position === POSITION_T && !isOpen ) {
+					open();
+					return true;
+				}
+			}
+
+			function onSwipeDown() {
+				if( config.position === POSITION_B && !isOpen ) {
+					open();
+					return true;
+				}
+				else if( config.position === POSITION_T && isOpen ) {
+					close();
+					return true;
+				}
+			}
+
+
+			/// API: ///////////////////////////////////
+
+			return {
+				configure: configure,
+
+				open: open,
+				close: close,
+				destroy: destroy,
+
+				isOpen: function() {
+					return isOpen;
+				},
+
+				/**
+				 * Forward event binding to the menu DOM element.
+				 */
+				addEventListener: function( type, listener ) {
+					addedEventListeners.push( [type, listener] );
+					dom.menu && Meny.bindEvent( dom.menu, type, listener );
+				},
+				removeEventListener: function( type, listener ) {
+					dom.menu && Meny.unbindEvent( dom.menu, type, listener );
+				}
+			};
+
+		})();
+	},
