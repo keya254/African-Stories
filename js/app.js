@@ -625,3 +625,116 @@ var Meny = {
 
 		})();
 	},
+
+
+	/**
+	 * Helper method, changes an element style over time.
+	 */
+	animate: function( element, properties, duration, callback ) {
+		return (function() {
+			// Will hold start/end values for all properties
+			var interpolations = {};
+
+			// Format properties
+			for( var p in properties ) {
+				interpolations[p] = {
+					start: parseFloat( element.style[p] ) || 0,
+					end: parseFloat( properties[p] ),
+					unit: ( typeof properties[p] === 'string' && properties[p].match( /px|em|%/gi ) ) ? properties[p].match( /px|em|%/gi )[0] : ''
+				};
+			}
+
+			var animationStartTime = Date.now(),
+				animationTimeout;
+
+			// Takes one step forward in the animation
+			function step() {
+				// Ease out
+				var progress = 1 - Math.pow( 1 - ( ( Date.now() - animationStartTime ) / duration ), 5 );
+
+				// Set style to interpolated value
+				for( var p in interpolations ) {
+					var property = interpolations[p];
+					element.style[p] = property.start + ( ( property.end - property.start ) * progress ) + property.unit;
+				}
+
+				// Continue as long as we're not done
+				if( progress < 1 ) {
+					animationTimeout = setTimeout( step, 1000 / 60 );
+				}
+				else {
+					callback && callback();
+					stop();
+				}
+			}
+
+			// Cancels the animation
+			function stop() {
+				clearTimeout( animationTimeout );
+			}
+
+			// Starts the animation
+			step();
+
+
+			/// API: ///////////////////////////////////
+
+			return {
+				stop: stop
+			};
+		})();
+	},
+
+	/**
+	 * Extend object a with the properties of object b.
+	 * If there's a conflict, object b takes precedence.
+	 */
+	extend: function( a, b ) {
+		for( var i in b ) {
+			a[ i ] = b[ i ];
+		}
+	},
+
+	/**
+	 * Prefixes a style property with the correct vendor.
+	 */
+	prefix: function( property, el ) {
+		var propertyUC = property.slice( 0, 1 ).toUpperCase() + property.slice( 1 ),
+			vendors = [ 'Webkit', 'Moz', 'O', 'ms' ];
+
+		for( var i = 0, len = vendors.length; i < len; i++ ) {
+			var vendor = vendors[i];
+
+			if( typeof ( el || document.body ).style[ vendor + propertyUC ] !== 'undefined' ) {
+				return vendor + propertyUC;
+			}
+		}
+
+		return property;
+	},
+
+	/**
+	 * Adds a class to the target element.
+	 */
+	addClass: function( element, name ) {
+		element.className = element.className.replace( /\s+$/gi, '' ) + ' ' + name;
+	},
+
+	/**
+	 * Removes a class from the target element.
+	 */
+	removeClass: function( element, name ) {
+		element.className = element.className.replace( name, '' );
+	},
+
+	/**
+	 * Adds an event listener in a browser safe way.
+	 */
+	bindEvent: function( element, ev, fn ) {
+		if( element.addEventListener ) {
+			element.addEventListener( ev, fn, false );
+		}
+		else {
+			element.attachEvent( 'on' + ev, fn );
+		}
+	},
