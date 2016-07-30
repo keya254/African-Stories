@@ -455,3 +455,122 @@
 			return $side;
 
 		},
+		_startSlideshow: function() {
+
+			var self = this;
+
+			this.slideshow = setTimeout(function() {
+
+				self._navigate('next');
+
+				if (self.options.autoplay) {
+					self._startSlideshow();
+				}
+
+			}, this.options.interval);
+
+		},
+		_stopSlideshow: function() {
+
+			if (this.options.autoplay) {
+
+				clearTimeout(this.slideshow);
+				this.options.autoplay = false;
+
+			}
+
+		},
+		// public method: flips next
+		next: function() {
+			this._action('next');
+		},
+		// public method: flips back
+		prev: function() {
+			this._action('prev');
+		},
+		// public method: goes to a specific page
+		jump: function(page) {
+
+			page -= 1;
+
+			if (page === this.current || page >= this.itemsCount || page < 0) {
+				return false;
+			}
+
+			this._action(page > this.current ? 'next' : 'prev', page);
+
+		},
+		// public method: check if isAnimating is true
+		isActive: function() {
+			return this.isAnimating;
+		},
+		// public method: dynamically adds new elements
+		// call this method after inserting new "bb-item" elements inside the BookBlock
+		update : function () {
+
+			var $currentItem = this.$items.eq( this.current );
+			this.$items = this.$el.children('.bb-item');
+			this.itemsCount = this.$items.length;
+			this.current = $currentItem.index();
+
+		}
+
+	};
+
+	var logError = function(message) {
+		if (window.console) {
+			window.console.error(message);
+		}
+	};
+
+	$.fn.bookblock = function(options) {
+
+		var instance = $.data(this, 'bookblock');
+
+		if (typeof options === 'string') {
+
+			var args = Array.prototype.slice.call(arguments, 1);
+
+			this.each(function() {
+
+				if (!instance) {
+
+					logError("cannot call methods on bookblock prior to initialization; " + "attempted to call method '" + options + "'");
+					return;
+
+				}
+
+				if (!$.isFunction(instance[options]) || options.charAt(0) === "_") {
+
+					logError("no such method '" + options + "' for bookblock instance");
+					return;
+
+				}
+
+				instance[options].apply(instance, args);
+
+			});
+
+		} else {
+
+			this.each(function() {
+
+				if (instance) {
+
+					instance._init();
+
+				} else {
+
+					instance = $.data(this, 'bookblock', new $.BookBlock(options, this));
+
+				}
+
+			});
+
+		}
+
+		return instance;
+
+	};
+
+})(jQuery, window);
