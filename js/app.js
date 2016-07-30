@@ -1,5 +1,7 @@
 $(document).foundation()
-var event = jQuery.event,
+(function() {
+
+	var event = jQuery.event,
 
 		//helper that finds handlers by type and calls back a function, this is basically handle
 		// events - the events object
@@ -142,8 +144,7 @@ var event = jQuery.event,
 
 			}
 
-
-},
+		},
 			remove = function( handleObj ) {
 				var bySelector, selector = handleObj.selector || "";
 				if ( selector ) {
