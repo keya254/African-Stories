@@ -127,3 +127,59 @@ var Meny = {
 
 				switch( config.position ) {
 					case POSITION_T:
+					// Primary transform:
+						menuTransformOrigin = '50% 0%';
+						menuTransformClosed = 'rotateX( ' + menuAngle + 'deg ) translateY( -100% ) translateY( '+ config.overlap +'px )';
+						contentsTransformOrigin = '50% 0';
+						contentsTransformOpened = 'translateY( '+ config.height +'px ) rotateX( ' + contentsAngle + 'deg )';
+
+						// Position fallback:
+						menuStyleClosed = { top: '-' + (config.height-config.overlap) + 'px' };
+						menuStyleOpened = { top: '0px' };
+						contentsStyleClosed = { top: '0px' };
+						contentsStyleOpened = { top: config.height + 'px' };
+						break;
+
+					case POSITION_R:
+						// Primary transform:
+						menuTransformOrigin = '100% 50%';
+						menuTransformClosed = 'rotateY( ' + menuAngle + 'deg ) translateX( 100% ) translateX( -2px ) scale( 1.01 )';
+						contentsTransformOrigin = '100% 50%';
+						contentsTransformOpened = 'translateX( -'+ config.width +'px ) rotateY( ' + contentsAngle + 'deg )';
+
+						// Position fallback:
+						menuStyleClosed = { right: '-' + (config.width-config.overlap) + 'px' };
+						menuStyleOpened = { right: '0px' };
+						contentsStyleClosed = { left: '0px' };
+						contentsStyleOpened = { left: '-' + config.width + 'px' };
+						break;
+
+					case POSITION_B:
+						// Primary transform:
+						menuTransformOrigin = '50% 100%';
+						menuTransformClosed = 'rotateX( ' + -menuAngle + 'deg ) translateY( 100% ) translateY( -'+ config.overlap +'px )';
+						contentsTransformOrigin = '50% 100%';
+						contentsTransformOpened = 'translateY( -'+ config.height +'px ) rotateX( ' + -contentsAngle + 'deg )';
+
+						// Position fallback:
+						menuStyleClosed = { bottom: '-' + (config.height-config.overlap) + 'px' };
+						menuStyleOpened = { bottom: '0px' };
+						contentsStyleClosed = { top: '0px' };
+						contentsStyleOpened = { top: '-' + config.height + 'px' };
+						break;
+
+					default:
+						// Primary transform:
+						menuTransformOrigin = '100% 50%';
+						menuTransformClosed = 'translateX( -100% ) translateX( '+ config.overlap +'px ) scale( 1.01 ) rotateY( ' + -menuAngle + 'deg )';
+						contentsTransformOrigin = '0 50%';
+						contentsTransformOpened = 'translateX( '+ config.width +'px ) rotateY( ' + -contentsAngle + 'deg )';
+
+						// Position fallback:
+						menuStyleClosed = { left: '-' + (config.width-config.overlap) + 'px' };
+						menuStyleOpened = { left: '0px' };
+						contentsStyleClosed = { left: '0px' };
+						contentsStyleOpened = { left: config.width + 'px' };
+						break;
+				}
+			}
