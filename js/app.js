@@ -183,3 +183,55 @@ var Meny = {
 						break;
 				}
 			}
+
+			/**
+			 * The wrapper element holds the menu and contents.
+			 */
+			function setupWrapper() {
+				// Add a class to allow for custom styles based on
+				// position
+				Meny.addClass( dom.wrapper, 'meny-' + config.position );
+
+				originalStyles.wrapper = dom.wrapper.style.cssText;
+
+				dom.wrapper.style[ Meny.prefix( 'perspective' ) ] = '800px';
+				dom.wrapper.style[ Meny.prefix( 'perspectiveOrigin' ) ] = contentsTransformOrigin;
+			}
+
+			/**
+			 * The cover is used to obfuscate the contents while
+			 * Meny is open.
+			 */
+			function setupCover() {
+				if( dom.cover ) {
+					dom.cover.parentNode.removeChild( dom.cover );
+				}
+
+				dom.cover = document.createElement( 'div' );
+
+				// Disabled until a falback fade in animation is added
+				dom.cover.style.position = 'absolute';
+				dom.cover.style.display = 'block';
+				dom.cover.style.width = '100%';
+				dom.cover.style.height = '100%';
+				dom.cover.style.left = 0;
+				dom.cover.style.top = 0;
+				dom.cover.style.zIndex = 1000;
+				dom.cover.style.visibility = 'hidden';
+				dom.cover.style.opacity = 0;
+
+				// Silence unimportant errors in IE8
+				try {
+					dom.cover.style.background = 'rgba( 0, 0, 0, 0.4 )';
+					dom.cover.style.background = '-ms-linear-gradient('+ config.position +','+ config.gradient;
+					dom.cover.style.background = '-moz-linear-gradient('+ config.position +','+ config.gradient;
+					dom.cover.style.background = '-webkit-linear-gradient('+ config.position +','+ config.gradient;
+				}
+				catch( e ) {}
+
+				if( supports3DTransforms ) {
+					dom.cover.style[ Meny.prefix( 'transition' ) ] = 'all ' + config.transitionDuration +' '+ config.transitionEasing;
+				}
+
+				dom.contents.appendChild( dom.cover );
+			}
