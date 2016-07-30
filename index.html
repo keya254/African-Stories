@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="css/demo.css">
   </head>
   <body>
+    <!--the nav bar-->
     <div class="meny">
       <h2>AFRICAN STORIES</h2>
       <ul>
@@ -29,7 +30,7 @@
         <li><a href="Story 6.html">Story 6</a></li>
         <li><a href="Story 7.html">Story 7</a></li>
         <li><a href="Story 8.html">Story 8</a></li>
-        <li><a href="Story 9.html">Story 9/a></li>
+        <li><a href="Story 9.html">Story 9</a></li>
       </ul>
     </div>
 
@@ -37,7 +38,14 @@
 
     <div class="contents">
       <article>
-        <h1>Meny</h1>
+        <h1>Stories</h1>
+        <p>
+          What are stories ? What are stories for?
+It's hard to get behind this question because we are always inside it. We are in stories (narratives), we make them up, we use them, we are in some senses made by them. It's very hard to think, talk or write for very long without starting to put things into a sequence that relates something, retells something. In a way, trying to figure out what they're for is a bit like meaning-of-life and what-makes-us-human questions: too big. And yet...there ought to be some way to distinguish 'storying' from other things. We ought to be able to say that it's different from, say, philosophy without the anecdotes, an anatomy textbook, grammar, a good deal of sensory activity...
+But then a lot of things that we don't call stories become stories when you look at them closely: instructions on how to assemble a flat-pack table? The narrative voice isn't the usual one of stories - 'Place leg (A) next to flange (C) etc...' but it has all the sequencing of story, it has very clear structure (beginning, middle, end)... I guess it lacks some sense that it's not only 'itself' but that it 'stands for' something other than itself. The instructions might be typical - stereotypical even - but they are there just for that table, or chair or whatever. 
+
+My father in his great booklet, 'Stories and Meanings' (NATE publications) pointed out that there are a lot of things we say and write which are in effect residual cores of stories: if you say a proverb, it seems to conjure up a story that you don't have to tell. All you need to say is, 'Too many cooks...' and that's the core of the longer proverb which in turn is the core of a scene which is in effect a story that says something like: 'Once there was a kitchen and there were some cooks making some broth. As they made the broth, it started getting spoiled and it became clear that the reason why it was getting spoiled was that there were too many cooks.' And that is the core of a yet longer story which explains that is was what each of the too many cooks was doing that ended up in the soup getting spoiled.<li> <a href="http://michaelrosenblog.blogspot.co.ke/2012/01/what-are-stories-what-are-stories-for.html">click me to read more</a></li>
+        </p>
         
           Created by <a href="#">@olagz</a> 
         </small>
@@ -51,6 +59,53 @@
 
       <a href="https://github.com/olagodavid/African-Stories"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://github-camo.global.ssl.fastly.net/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub"></a>
     </div>
+    <script src="js/meny.js"></script>
+    <script>
+      // Create an instance of Meny
+      var meny = Meny.create({
+        // The element that will be animated in from off screen
+        menuElement: document.querySelector( '.meny' ),
+
+        // The contents that gets pushed aside while Meny is active
+        contentsElement: document.querySelector( '.contents' ),
+
+        // [optional] The alignment of the menu (top/right/bottom/left)
+        position: Meny.getQuery().p || 'left',
+
+        // [optional] The height of the menu (when using top/bottom position)
+        height: 200,
+
+        // [optional] The width of the menu (when using left/right position)
+        width: 260,
+
+        // [optional] Distance from mouse (in pixels) when menu should open
+        threshold: 40,
+
+        // [optional] Use mouse movement to automatically open/close
+        mouse: true,
+
+        // [optional] Use touch swipe events to open/close
+        touch: true
+      });
+
+      // API Methods:
+      // meny.open();
+      // meny.close();
+      // meny.isOpen();
+
+      // Events:
+      // meny.addEventListener( 'open', function(){ console.log( 'open' ); } );
+      // meny.addEventListener( 'close', function(){ console.log( 'close' ); } );
+
+      // Embed an iframe if a URL is passed in
+      if( Meny.getQuery().u && Meny.getQuery().u.match( /^http/gi ) ) {
+        var contents = document.querySelector( '.contents' );
+        contents.style.padding = '0px';
+        contents.innerHTML = '<div class="cover"></div><iframe src="'+ Meny.getQuery().u +'" style="width: 100%; height: 100%; border: 0; position: absolute;"></iframe>';
+      }
+    </script>
+
+    <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
 
     
 
