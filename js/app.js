@@ -370,3 +370,141 @@ var Meny = {
 					Meny.dispatchEvent( dom.menu, 'open' );
 				}
 			}
+
+			/**
+			 * Collapses the menu.
+			 */
+			function close() {
+				if( isOpen ) {
+					isOpen = false;
+
+					Meny.removeClass( dom.wrapper, 'meny-active' );
+
+					// Use transforms and transitions if available...
+					if( supports3DTransforms ) {
+						// 'webkitAnimationEnd oanimationend msAnimationEnd animationend transitionend'
+						Meny.bindEventOnce( dom.wrapper, 'transitionend', function() {
+							Meny.dispatchEvent( dom.menu, 'closed' );
+						} );
+
+						dom.cover.style.visibility = 'hidden';
+						dom.cover.style.opacity = 0;
+
+						dom.contents.style[ Meny.prefix( 'transform' ) ] = contentsTransformClosed;
+						dom.menu.style[ Meny.prefix( 'transform' ) ] = menuTransformClosed;
+					}
+					// ...fall back on JS animation
+					else {
+						menuAnimation && menuAnimation.stop();
+						menuAnimation = Meny.animate( dom.menu, menuStyleClosed, 500 );
+						contentsAnimation && contentsAnimation.stop();
+						contentsAnimation = Meny.animate( dom.contents, contentsStyleClosed, 500 );
+						coverAnimation && coverAnimation.stop();
+						coverAnimation = Meny.animate( dom.cover, { opacity: 0 }, 500, function() {
+							dom.cover.style.visibility = 'hidden';
+							Meny.dispatchEvent( dom.menu, 'closed' );
+						} );
+					}
+					Meny.dispatchEvent( dom.menu, 'close' );
+				}
+			}
+
+			/**
+			 * Unbinds Meny and resets the DOM to the state it
+			 * was at before Meny was initialized.
+			 */
+			function destroy() {
+				dom.wrapper.style.cssText = originalStyles.wrapper
+				dom.menu.style.cssText = originalStyles.menu;
+				dom.contents.style.cssText = originalStyles.contents;
+
+				if( dom.cover && dom.cover.parentNode ) {
+					dom.cover.parentNode.removeChild( dom.cover );
+				}
+
+				Meny.unbindEvent( document, 'touchstart', onTouchStart );
+				Meny.unbindEvent( document, 'touchend', onTouchEnd );
+				Meny.unbindEvent( document, 'mousedown', onMouseDown );
+				Meny.unbindEvent( document, 'mouseup', onMouseUp );
+				Meny.unbindEvent( document, 'mousemove', onMouseMove );
+
+				for( var i in addedEventListeners ) {
+					this.removeEventListener( addedEventListeners[i][0], addedEventListeners[i][1] );
+				}
+
+				addedEventListeners = [];
+			}
+
+/// INPUT: /////////////////////////////////
+
+			function onMouseDown( event ) {
+				isMouseDown = true;
+			}
+
+			function onMouseMove( event ) {
+				// Prevent opening/closing when mouse is down since
+				// the user may be selecting text
+				if( !isMouseDown ) {
+					var x = event.clientX - indentX,
+						y = event.clientY - indentY;
+
+					switch( config.position ) {
+						case POSITION_T:
+							if( y > config.height ) {
+								close();
+							}
+							else if( y < config.threshold ) {
+								open();
+							}
+							break;
+
+						case POSITION_R:
+							var w = dom.wrapper.offsetWidth;
+							if( x < w - config.width ) {
+								close();
+							}
+							else if( x > w - config.threshold ) {
+								open();
+							}
+							break;
+
+						case POSITION_B:
+							var h = dom.wrapper.offsetHeight;
+							if( y < h - config.height ) {
+								close();
+							}
+							else if( y > h - config.threshold ) {
+								open();
+							}
+							break;
+
+						case POSITION_L:
+							if( x > config.width ) {
+								close();
+							}
+							else if( x < config.threshold ) {
+								open();
+							}
+							break;
+					}
+				}
+			}
+
+			function onMouseUp( event ) {
+				isMouseDown = false;
+			}
+
+			function onTouchStart( event ) {
+				touchStartX = event.touches[0].clientX - indentX;
+				touchStartY = event.touches[0].clientY - indentY;
+				touchMoveX = null;
+				touchMoveY = null;
+
+				Meny.bindEvent( document, 'touchmove', onTouchMove );
+			}
+
+			function onTouchMove( event ) {
+				touchMoveX = event.touches[0].clientX - indentX;
+				touchMoveY = event.touches[0].clientY - indentY;
+
+				var swipeMethod = null;
