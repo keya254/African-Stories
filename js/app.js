@@ -235,3 +235,75 @@ var Meny = {
 
 				dom.contents.appendChild( dom.cover );
 			}
+
+			/**
+			 * The meny element that folds out upon activation.
+			 */
+			function setupMenu() {
+				// Shorthand
+				var style = dom.menu.style;
+
+				switch( config.position ) {
+					case POSITION_T:
+						style.width = '100%';
+						style.height = config.height + 'px';
+						break;
+
+					case POSITION_R:
+						style.right = '0';
+						style.width = config.width + 'px';
+						style.height = '100%';
+						break;
+
+					case POSITION_B:
+						style.bottom = '0';
+						style.width = '100%';
+						style.height = config.height + 'px';
+						break;
+
+					case POSITION_L:
+						style.width = config.width + 'px';
+						style.height = '100%';
+						break;
+				}
+
+				originalStyles.menu = style.cssText;
+
+				style.position = 'fixed';
+				style.display = 'block';
+				style.zIndex = 1;
+
+				if( supports3DTransforms ) {
+					style[ Meny.prefix( 'transform' ) ] = menuTransformClosed;
+					style[ Meny.prefix( 'transformOrigin' ) ] = menuTransformOrigin;
+					style[ Meny.prefix( 'transition' ) ] = 'all ' + config.transitionDuration +' '+ config.transitionEasing;
+				}
+				else {
+					Meny.extend( style, menuStyleClosed );
+				}
+			}
+
+			/**
+			 * The contents element which gets pushed aside while
+			 * Meny is open.
+			 */
+			function setupContents() {
+				// Shorthand
+				var style = dom.contents.style;
+
+				originalStyles.contents = style.cssText;
+
+				if( supports3DTransforms ) {
+					style[ Meny.prefix( 'transform' ) ] = contentsTransformClosed;
+					style[ Meny.prefix( 'transformOrigin' ) ] = contentsTransformOrigin;
+					style[ Meny.prefix( 'transition' ) ] = 'all ' + config.transitionDuration +' '+ config.transitionEasing;
+				}
+				else {
+					style.position = style.position.match( /relative|absolute|fixed/gi ) ? style.position : 'relative';
+					Meny.extend( style, contentsStyleClosed );
+				}
+			}
+
+			/**
+			 * Attaches all input event listeners.
+			 */
