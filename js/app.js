@@ -46,7 +46,7 @@ var Page = (function() {
 		initEvents();
 
 	}
-
+	
 	function initEvents() {
 
 		// add navigation events
