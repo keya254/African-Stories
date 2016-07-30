@@ -307,3 +307,66 @@ var Meny = {
 			/**
 			 * Attaches all input event listeners.
 			 */
+
+			 function bindEvents() {
+
+				if( 'ontouchstart' in window ) {
+					if( config.touch ) {
+						Meny.bindEvent( document, 'touchstart', onTouchStart );
+						Meny.bindEvent( document, 'touchend', onTouchEnd );
+					}
+					else {
+						Meny.unbindEvent( document, 'touchstart', onTouchStart );
+						Meny.unbindEvent( document, 'touchend', onTouchEnd );
+					}
+				}
+
+				if( config.mouse ) {
+					Meny.bindEvent( document, 'mousedown', onMouseDown );
+					Meny.bindEvent( document, 'mouseup', onMouseUp );
+					Meny.bindEvent( document, 'mousemove', onMouseMove );
+				}
+				else {
+					Meny.unbindEvent( document, 'mousedown', onMouseDown );
+					Meny.unbindEvent( document, 'mouseup', onMouseUp );
+					Meny.unbindEvent( document, 'mousemove', onMouseMove );
+				}
+			}
+
+			/**
+			 * Expands the menu.
+			 */
+			function open() {
+				if( !isOpen ) {
+					isOpen = true;
+
+					Meny.addClass( dom.wrapper, 'meny-active' );
+
+					dom.cover.style.height = dom.contents.scrollHeight + 'px';
+					dom.cover.style.visibility = 'visible';
+
+					// Use transforms and transitions if available...
+					if( supports3DTransforms ) {
+						// 'webkitAnimationEnd oanimationend msAnimationEnd animationend transitionend'
+						Meny.bindEventOnce( dom.wrapper, 'transitionend', function() {
+							Meny.dispatchEvent( dom.menu, 'opened' );
+						} );
+
+						dom.cover.style.opacity = 1;
+
+						dom.contents.style[ Meny.prefix( 'transform' ) ] = contentsTransformOpened;
+						dom.menu.style[ Meny.prefix( 'transform' ) ] = menuTransformOpened;
+					}
+					// ...fall back on JS animation
+					else {
+						menuAnimation && menuAnimation.stop();
+						menuAnimation = Meny.animate( dom.menu, menuStyleOpened, 500 );
+						contentsAnimation && contentsAnimation.stop();
+						contentsAnimation = Meny.animate( dom.contents, contentsStyleOpened, 500 );
+						coverAnimation && coverAnimation.stop();
+						coverAnimation = Meny.animate( dom.cover, { opacity: 1 }, 500 );
+					}
+
+					Meny.dispatchEvent( dom.menu, 'open' );
+				}
+			}
