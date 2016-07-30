@@ -73,3 +73,57 @@ var Meny = {
 				touchMoveY = null,
 				isOpen = false,
 				isMouseDown = false;
+
+				// Precalculated transform and style states
+			var menuTransformOrigin,
+				menuTransformClosed,
+				menuTransformOpened,
+				menuStyleClosed,
+				menuStyleOpened,
+
+				contentsTransformOrigin,
+				contentsTransformClosed,
+				contentsTransformOpened,
+				contentsStyleClosed,
+				contentsStyleOpened;
+
+			var originalStyles = {},
+				addedEventListeners = [];
+
+			// Ongoing animations (for fallback mode)
+			var menuAnimation,
+				contentsAnimation,
+				coverAnimation;
+
+			configure( options );
+
+			/**
+			 * Initializes Meny with the specified user options,
+			 * may be called multiple times as configuration changes.
+			 */
+			function configure( o ) {
+				// Extend the default config object with the passed in
+				// options
+				Meny.extend( config, o );
+
+				setupPositions();
+				setupWrapper();
+				setupCover();
+				setupMenu();
+				setupContents();
+
+				bindEvents();
+			}
+
+			/**
+			 * Prepares the transforms for the current positioning
+			 * settings.
+			 */
+			function setupPositions() {
+				menuTransformOpened = '';
+				contentsTransformClosed = '';
+				menuAngle = config.angle;
+				contentsAngle = config.angle / -2;
+
+				switch( config.position ) {
+					case POSITION_T:
