@@ -738,3 +738,56 @@ var Meny = {
 			element.attachEvent( 'on' + ev, fn );
 		}
 	},
+
+/**
+	 * Removes an event listener in a browser safe way.
+	 */
+	unbindEvent: function( element, ev, fn ) {
+		if( element.removeEventListener ) {
+			element.removeEventListener( ev, fn, false );
+		}
+		else {
+			element.detachEvent( 'on' + ev, fn );
+		}
+	},
+
+	bindEventOnce: function ( element, ev, fn ) {
+		var me = this;
+		var listener = function() {
+			me.unbindEvent( element, ev, listener );
+			fn.apply( this, arguments );
+		};
+		this.bindEvent( element, ev, listener );
+	},
+
+	/**
+	 * Dispatches an event of the specified type from the
+	 * menu DOM element.
+	 */
+	dispatchEvent: function( element, type, properties ) {
+		if( element ) {
+			var event = document.createEvent( "HTMLEvents", 1, 2 );
+			event.initEvent( type, true, true );
+			Meny.extend( event, properties );
+			element.dispatchEvent( event );
+		}
+	},
+
+	/**
+	 * Retrieves query string as a key/value hash.
+	 */
+	getQuery: function() {
+		var query = {};
+
+		location.search.replace( /[A-Z0-9]+?=([\w|:|\/\.]*)/gi, function(a) {
+			query[ a.split( '=' ).shift() ] = a.split( '=' ).pop();
+		} );
+
+		return query;
+	}
+
+};
+
+return Meny;
+
+}));
